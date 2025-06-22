@@ -22,6 +22,7 @@ dependencies:
   http: ^1.4.0
   convert: ^3.1.2
   camera: ^0.11.1
+  openfoodfacts: ^3.23.0
   mobile_scanner: ^7.0.0
 
 dev_dependencies:

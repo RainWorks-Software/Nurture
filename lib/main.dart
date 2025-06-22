@@ -1,10 +1,12 @@
 import "dart:io";
 import "package:flutter/material.dart";
+import "package:ofd/utils/openfoodfacts.dart";
 
 import "./material_app.dart";
 import "./cupertino_app.dart";
 
 void main() {
+  initFoodFactsConfiguration();
   runApp(const App());
 }
 
