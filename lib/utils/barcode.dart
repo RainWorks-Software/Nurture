@@ -40,6 +40,9 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
       _subscription ??= controller.barcodes.listen(_handleBarcode);
       print("returned to page, attempting to start camera again");
       unawaited(controller.start());
+      setState(() {
+        hasScannedBarcode = false;
+      });
       // Future.delayed(Duration(seconds: 2), () {
       //   hasScannedBarcode = false;
       // });
@@ -107,7 +110,9 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
 
     if (barcodeData == null) return;
 
-    hasScannedBarcode = true;
+    setState(() {
+      hasScannedBarcode = true;
+    });
 
     context.pushNamed("scanned", pathParameters: {"upc": barcodeData});
     await controller.stop();
