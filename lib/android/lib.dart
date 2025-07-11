@@ -1,3 +1,4 @@
-library AndroidWidgets;
+library;
 
-export "ScannedBarcode.dart";
+export "HomePage.dart";
+export "FoodCard.dart";

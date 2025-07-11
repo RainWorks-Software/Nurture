@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:ofd/android/lib.dart' as android;
 
@@ -31,10 +33,38 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
   );
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    if (ModalRoute.of(context)?.isCurrent == true) {
+      _subscription ??= controller.barcodes.listen(_handleBarcode);
+      print("returned to page, attempting to start camera again");
+      unawaited(controller.start());
+      Future.delayed(Duration(seconds: 2), () {
+        hasScannedBarcode = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Start listening to lifecycle changes.
+    WidgetsBinding.instance.addObserver(this);
+
+    // Start listening to the barcode events.
+    _subscription = controller.barcodes.listen(_handleBarcode);
+
+    // Finally, start the scanner itself.
+    unawaited(controller.start());
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // If the controller is not ready, do not try to start or stop it.
     // Permission dialogs can trigger lifecycle changes before the controller is ready.
     if (!controller.value.hasCameraPermission) {
+      throw "No camera permisson";
       return;
     }
 
@@ -58,35 +88,33 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
     }
   }
 
-  void _handleBarcode(BarcodeCapture capture) {
+  @override
+  Future<void> dispose() async {
+    // Stop listening to lifecycle changes.
+    WidgetsBinding.instance.removeObserver(this);
+    // Stop listening to the barcode events.
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+    // Dispose the widget itself.
+    super.dispose();
+    // Finally, dispose of the controller.
+    await controller.dispose();
+  }
+
+  void _handleBarcode(BarcodeCapture capture) async {
     if (!mounted || hasScannedBarcode) return;
     final barcodeData = capture.barcodes.first.rawValue;
 
     if (barcodeData == null) return;
 
-    if (Platform.isAndroid) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              android.ScannedBarcodePage(barcodeData: barcodeData),
-        ),
-      );
-      setState(() {
-        hasScannedBarcode = true;
-      });
-    } else if (Platform.isIOS) {
-    } else {
-      throw "unsupported platform";
-    }
+    hasScannedBarcode = true;
+
+    context.pushNamed("scanned", pathParameters: {"upc": barcodeData});
+    await controller.stop();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        MobileScanner(onDetect: _handleBarcode, controller: controller),
-      ],
-    );
+    return MobileScanner(onDetect: _handleBarcode, controller: controller);
   }
 }

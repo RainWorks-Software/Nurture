@@ -1,6 +1,6 @@
 name: ofd
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
@@ -18,12 +18,13 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  http: ^1.4.0
-  convert: ^3.1.2
-  camera: ^0.11.1
-  openfoodfacts: ^3.23.0
-  mobile_scanner: ^7.0.0
+  cupertino_icons: ^1.0.8 # apple icons
+  http: ^1.4.0 # http requests
+  convert: ^3.1.2 # idk
+  openfoodfacts: ^3.23.0 # food facts api
+  mobile_scanner: ^7.0.0 # scan barcode api
+  go_router: ^16.0.0 # routing
+  iconify_flutter: ^0.0.7 #android icons
 
 dev_dependencies:
   flutter_test:
@@ -41,7 +42,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
