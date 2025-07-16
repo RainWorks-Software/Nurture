@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
@@ -18,7 +19,7 @@ class _FoodCardState extends State<FoodCard> {
     ProductQueryConfiguration configuration = ProductQueryConfiguration(widget.upcCode, version: ProductQueryVersion.v3);
     ProductResultV3 foodDetails = await OpenFoodAPIClient.getProductV3(configuration) ;
 
-    return foodDetails;    
+    return foodDetails; 
   }
   
   late Future<ProductResultV3> foodData;
@@ -34,7 +35,9 @@ class _FoodCardState extends State<FoodCard> {
     return Scaffold(
       body: FutureBuilder(future: foodData, builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Center(child: Text(snapshot.data?.product?.productName ?? "no product name"));
+          log(snapshot.data?.product?.toJson().toString() ?? "no product information");
+
+          return Center(child: Text(snapshot.data?.product?.toJson().toString() ?? "no product data"));
         } else {
           return Center(child: CircularProgressIndicator());
         }

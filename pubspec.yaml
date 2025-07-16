@@ -27,6 +27,7 @@ dependencies:
   iconify_flutter: ^0.0.7 #android icons
   permission_handler: ^12.0.1 # permissions
   shared_preferences: ^2.5.3 # persistent configuration
+  path_provider: ^2.1.5 # user information will be stored here
 
 dev_dependencies:
   flutter_test:

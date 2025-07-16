@@ -1,5 +1,6 @@
 import "dart:io";
 import "package:flutter/material.dart";
+import "package:ofd/utils/allergen_store.dart";
 import "package:ofd/utils/openfoodfacts.dart";
 
 import "./material_app.dart";
@@ -7,6 +8,7 @@ import "./cupertino_app.dart";
 
 void main() {
   initFoodFactsConfiguration();
+  initAllergenConfiguration();
   runApp(const App());
 }
 

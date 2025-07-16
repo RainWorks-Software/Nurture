@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:ofd/android/lib.dart' as android;
 
 class SelfBarcodeImplementation extends StatefulWidget {
   const SelfBarcodeImplementation({super.key});
