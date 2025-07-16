@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'dart:developer';
+
 import 'package:go_router/go_router.dart';
-import 'package:iconify_flutter/icons/ph.dart';
 import 'package:ofd/android/lib.dart' as Android;
-import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final routerAndroid = GoRouter(
   routes: [
@@ -11,36 +10,11 @@ final routerAndroid = GoRouter(
     GoRoute(path: "/scanned/:upc", name: "scanned", builder: (context, state) {
       final upcCode = state.pathParameters["upc"]; 
       if (upcCode == null) throw UnimplementedError("upc code must be set.");
-      print("upcCode Route Searched: $upcCode");      
+      log("upcCode Route Searched: $upcCode");      
 
-      return Scaffold(
-        body: Android.FoodCard(upcCode: upcCode),
-        floatingActionButton: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FloatingActionButton.small(
-              onPressed: () {
-                // TODO: Implement AI chat functionality
-              },
-              tooltip: "Ask an AI",
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Iconify(Ph.robot),
-            ),
-            const SizedBox(height: 12),
-            FloatingActionButton(
-              onPressed: () => context.pop(),
-              tooltip: "Back",
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Iconify(Ph.caret_left),
-            ),
-          ],
-        ),
-      );
-    })
+      return Android.FoodCard(upcCode: upcCode);
+    }),
+    GoRoute(path: "/no-camera-access", name: "no_camera_access", builder: (context, state) => Android.NoPermissionPage(requiredPermission: Permission.camera))
   ],
 );
 

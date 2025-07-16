@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 
 class OFDCupertino extends StatelessWidget {
@@ -15,7 +17,7 @@ class OFDCupertino extends StatelessWidget {
             children: [
               Text("This is some text"),
               CupertinoButton.filled(onPressed: () {
-                print("button clicked");
+                log("button clicked");
               }, child: const Text("This is a button"))
             ]
           ),

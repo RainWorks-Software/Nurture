@@ -8,6 +8,7 @@ class OFDMaterial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      darkTheme: ThemeData.dark(),
       routerConfig: routerAndroid,
     );
   }

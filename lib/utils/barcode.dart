@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -22,7 +23,7 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
 
   final MobileScannerController controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
-    detectionTimeoutMs: 250,
+    detectionTimeoutMs: 1000,
     formats: [
       BarcodeFormat.ean13,
       BarcodeFormat.ean8,
@@ -38,14 +39,11 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
     super.didChangeDependencies();
     if (ModalRoute.of(context)?.isCurrent == true) {
       _subscription ??= controller.barcodes.listen(_handleBarcode);
-      print("returned to page, attempting to start camera again");
+      log("returned to page, attempting to start camera again");
       unawaited(controller.start());
       setState(() {
         hasScannedBarcode = false;
       });
-      // Future.delayed(Duration(seconds: 2), () {
-      //   hasScannedBarcode = false;
-      // });
     }
   }
 
@@ -67,7 +65,8 @@ class SelfBarcodeImplementationState extends State<SelfBarcodeImplementation>
     // If the controller is not ready, do not try to start or stop it.
     // Permission dialogs can trigger lifecycle changes before the controller is ready.
     if (!controller.value.hasCameraPermission) {
-      throw "No camera permisson";
+      context.goNamed("no_camera_access");
+      log("No camera permission granted. Going to show permission screen.");
       return;
     }
 
