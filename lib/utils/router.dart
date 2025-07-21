@@ -14,7 +14,8 @@ final routerAndroid = GoRouter(
 
       return Android.FoodCard(upcCode: upcCode);
     }),
-    GoRoute(path: "/no-camera-access", name: "no_camera_access", builder: (context, state) => Android.NoPermissionPage(requiredPermission: Permission.camera))
+    GoRoute(path: "/no-camera-access", name: "no_camera_access", builder: (context, state) => Android.NoPermissionPage(requiredPermission: Permission.camera)),
+    GoRoute(path: "/me", name: "me", builder: (context, state) => const Android.MePage()),
   ],
 );
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:ofd/utils/barcode.dart';
@@ -38,7 +39,9 @@ class HomePage extends StatelessWidget {
                  Tooltip(
                   preferBelow: false,
                   message: "Me",
-                  child: IconButton(onPressed: () {}, icon: const Iconify(Ph.user)),
+                  child: IconButton(onPressed: () {
+                    context.pushNamed("me");
+                  }, icon: const Iconify(Ph.user)),
                  ),
                  Tooltip(
                   preferBelow: false,
