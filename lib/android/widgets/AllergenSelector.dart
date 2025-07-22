@@ -23,12 +23,6 @@ const AllergenEnumToIcon = {
   AllergensTag.SOYBEANS: Ph.placeholder,
 };
 
-extension StandardReadingFormat on String {
-  String standardCapitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
-  }
-}
-
 enum AllergenSelectionEnum { ignore, warn, avoid }
 
 final AllergenSelectionEnumStyle = {
@@ -69,8 +63,11 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
 
   late Future<void> stateFuture;
 
-  Future<void> createNewAllergenConfigurationWithState(Map<AllergensTag, AllergenSelectionEnum> allergenStateArgument) async {
-    final UserAllergenConfiguration newAllergenConfiguration = UserAllergenConfiguration(avoid: [], warn: []);
+  Future<void> createNewAllergenConfigurationWithState(
+    Map<AllergensTag, AllergenSelectionEnum> allergenStateArgument,
+  ) async {
+    final UserAllergenConfiguration newAllergenConfiguration =
+        UserAllergenConfiguration(avoid: [], warn: []);
     allergenStateArgument.entries.forEach((allergenState) {
       final allergenString = allergenToString(allergenState.key);
       final allergenSelectionEnum = allergenState.value;
@@ -83,7 +80,6 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
         default:
           break;
       }
-
     });
 
     await writeAllergenConfigurationObject(newAllergenConfiguration);
@@ -124,10 +120,7 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
                           });
                         },
                         label: Text(
-                          allergenToString(allergen)
-                              .replaceAll("AllergensTag.", "")
-                              .replaceAll("_", " ")
-                              .standardCapitalize(),
+                          cleanupAllergenString(allergenToString(allergen)),
                         ),
                         avatar: Iconify(
                           AllergenEnumToIcon[allergen] ?? Ph.placeholder,
@@ -146,9 +139,12 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
                     )
                     .toList(),
               ),
-              FilledButton(onPressed: () {
-                createNewAllergenConfigurationWithState(allergenStates);
-              }, child: const Text("Save Changes")),
+              FilledButton(
+                onPressed: () {
+                  createNewAllergenConfigurationWithState(allergenStates);
+                },
+                child: const Text("Save Changes"),
+              ),
             ],
           );
         } else {

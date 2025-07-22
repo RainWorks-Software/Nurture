@@ -43,9 +43,17 @@ final defaultAllergenConfiguration = UserAllergenConfiguration(
 
 final List<AllergensTag> primaryAllergens = [...AllergensTag.values];
 
+extension StandardReadingFormat on String {
+  String standardCapitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+  }
+}
+
 String allergenToString(AllergensTag allergen) => allergen.toString();
 AllergensTag stringToAllergen(String allergenString) =>
     AllergensTag.values.firstWhere((e) => e.toString() == allergenString);
+AllergensTag looseStringToAllergen(String allergenName) => AllergensTag.values.firstWhere((e) => e.toString().contains(allergenName));
+String cleanupAllergenString(String allergenString) => allergenString.replaceAll("AllergensTag.", "").replaceAll("_", " ").standardCapitalize();
 
 Future<String> getConfigurationFolder() async {
   final dir = await getApplicationDocumentsDirectory();
