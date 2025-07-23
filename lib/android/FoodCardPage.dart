@@ -22,7 +22,6 @@ class _ProductSummaryWidgetState extends State<ProductSummaryWidget> {
   @override
   void initState() {
     super.initState();
-
     allergenConfiguration = getAllergenConfigurationObject();
   }
 
@@ -43,98 +42,170 @@ class _ProductSummaryWidgetState extends State<ProductSummaryWidget> {
 
     final Allergens? allergens = widget.productData.allergens;
     final List<AllergensTag> allergensConverted = [];
+
     if (allergens?.names != null) {
       for (final allergenName in allergens!.names) {
-        print("attempting to convert $allergenName");
-
         try {
           allergensConverted.add(looseStringToAllergen(allergenName));
         } catch (e) {
-          // Log allergens that can't be parsed. This happens when the
-          // openfoodfacts API returns an allergen that is not in the local
-          // AllergensTag enum.
           print('Could not parse allergen: "$allergenName"');
         }
       }
     }
 
-    List<AllergensTag> avoidConflicts(
-      List<AllergensTag> userPreference,
-      List<AllergensTag> productAllergens,
+    List<AllergensTag> filterMatches(
+      List<AllergensTag> userList,
+      List<AllergensTag> productList,
     ) {
-      return userPreference
-          .toSet()
-          .intersection(productAllergens.toSet())
-          .toList();
+      return userList.toSet().intersection(productList.toSet()).toList();
     }
-
-    List<AllergensTag> warnConflicts(
-      List<AllergensTag> userPreference,
-      List<AllergensTag> productAllergens,
-    ) {
-      return userPreference
-          .toSet()
-          .intersection(productAllergens.toSet())
-          .toList();
-    }
-
-    print("Allergens: ${allergensConverted.toString()}");
 
     return FutureBuilder(
       future: allergenConfiguration,
       builder: (context, snapshot) {
-        final avoidedAllergens = avoidConflicts(
-          snapshot.data?.avoid
-                  .map((allergenString) => stringToAllergen(allergenString))
-                  .toList() ??
-              [],
+        final avoidedAllergens = filterMatches(
+          snapshot.data?.avoid.map(stringToAllergen).toList() ?? [],
           allergensConverted,
         );
-
-        final warnedAllergens = warnConflicts(
-          snapshot.data?.warn
-                  .map((allergenString) => stringToAllergen(allergenString))
-                  .toList() ??
-              [],
+        final warnedAllergens = filterMatches(
+          snapshot.data?.warn.map(stringToAllergen).toList() ?? [],
           allergensConverted,
         );
 
         if (snapshot.connectionState == ConnectionState.done) {
-          return Container(
-            child: Column(
-              children: [
-                Text(productName),
-                Container(
-                  child: (allergensConverted.isNotEmpty)
-                      ? Column(
-                          children: allergensConverted
-                              .map((a) => Text(a.toString()))
-                              .toList(),
-                        )
-                      : Text(
-                          "No allergens were found. Please double check with package labeling or a trusted source.",
-                        ),
-                ),
-                if (allergensConverted.isNotEmpty &&
-                    avoidedAllergens.isNotEmpty)
-                  Column(
-                    children: [
-                      Text("These allergens conflict with your preferences:"),
-                      ...avoidedAllergens.map((a) => Text(a.toString())),
-                    ],
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Header
+                  if (imageUrl != null)
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(imageUrl, height: 160),
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  Text(
+                    productName,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                if (allergensConverted.isNotEmpty && warnedAllergens.isNotEmpty)
-                  Column(
-                    children: [
-                      Text("These allergens are warned with your preferences:"),
-                      ...warnedAllergens.map((a) => Text(a.toString())),
-                    ],
+                  Text(
+                    '$brand — $country',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                   ),
-              ],
+                  const SizedBox(height: 16),
+                  Divider(),
+
+                  // Allergens Section
+                  Text(
+                    "Detected Allergens",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  if (allergensConverted.isNotEmpty)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: allergensConverted
+                          .map(
+                            (a) => Chip(
+                              label: Text(cleanupAllergenString(a.toString())),
+                              avatar: Iconify(
+                                Ph.warning_circle_bold,
+                                size: 18,
+                                color: Colors.grey,
+                              ),
+                              // backgroundColor: Colors.orange[50],
+                              side: BorderSide(color: Colors.grey),
+                            ),
+                          )
+                          .toList(),
+                    )
+                  else
+                    Text(
+                      "No allergens detected. Please double-check with the product label or a trusted source.",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+
+                  const SizedBox(height: 16),
+
+                  // Avoided Allergens
+                  if (avoidedAllergens.isNotEmpty) ...[
+                    Text(
+                      "⚠️ Avoid — Conflicts with your preferences",
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium?.copyWith(color: Colors.red[800]),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: avoidedAllergens
+                          .map(
+                            (a) => Chip(
+                              label: Text(cleanupAllergenString(a.toString())),
+                              avatar: Iconify(
+                                Ph.x_circle_fill,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                              // backgroundColor: Colors.red[50],
+                              side: BorderSide(color: Colors.red),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Warned Allergens
+                  if (warnedAllergens.isNotEmpty) ...[
+                    Text(
+                      "⚠️ Warning — Use with caution",
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.amber[900],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: warnedAllergens
+                          .map(
+                            (a) => Chip(
+                              label: Text(a.toString()),
+                              avatar: Iconify(
+                                Ph.triangle,
+                                color: Colors.amber[800],
+                                size: 18,
+                              ),
+                              // backgroundColor: Colors.amber[50],
+                              side: BorderSide(color: Colors.amber),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+
+                  if (avoidedAllergens.isEmpty && warnedAllergens.isEmpty)
+                    Center(
+                      child: Text(
+                        "Nothing here conflicts. Always a best idea to double-check though.",
+                        style: TextStyle(color: Colors.green[200]),
+                      ),
+                    ),
+                ],
+              ),
             ),
           );
         } else {
-          return Container(child: Center(child: CircularProgressIndicator()));
+          return const Center(child: CircularProgressIndicator());
         }
       },
     );
@@ -150,24 +221,20 @@ class FoodCard extends StatefulWidget {
 }
 
 class _FoodCardState extends State<FoodCard> {
-  Future<ProductResultV3> getProductInformation() async {
-    ProductQueryConfiguration configuration = ProductQueryConfiguration(
-      widget.upcCode,
-      version: ProductQueryVersion.v3,
-    );
-    ProductResultV3 foodDetails = await OpenFoodAPIClient.getProductV3(
-      configuration,
-    );
-
-    return foodDetails;
-  }
-
   late Future<ProductResultV3> foodData;
 
   @override
   void initState() {
     super.initState();
-    foodData = getProductInformation();
+    foodData = _fetchProduct();
+  }
+
+  Future<ProductResultV3> _fetchProduct() async {
+    final config = ProductQueryConfiguration(
+      widget.upcCode,
+      version: ProductQueryVersion.v3,
+    );
+    return await OpenFoodAPIClient.getProductV3(config);
   }
 
   @override
@@ -177,18 +244,15 @@ class _FoodCardState extends State<FoodCard> {
         future: foodData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            log(
-              snapshot.data?.product?.toJson().toString() ??
-                  "no product information",
-            );
+            final product = snapshot.data?.product;
 
-            if (snapshot.data!.product == null) {
-              return Center(child: const Text("no product information"));
+            if (product == null) {
+              return const Center(child: Text("No product information found."));
             }
 
-            return ProductSummaryWidget(productData: snapshot.data!.product!);
+            return ProductSummaryWidget(productData: product);
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
@@ -196,8 +260,7 @@ class _FoodCardState extends State<FoodCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Tooltip(
-            message: "Ask an AI",
-            preferBelow: false,
+            message: "Ask AI about this product",
             child: FloatingActionButton.small(
               heroTag: "ai_btn",
               onPressed: () {
@@ -206,20 +269,19 @@ class _FoodCardState extends State<FoodCard> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Iconify(Ph.robot),
+              child: const Iconify(Ph.robot),
             ),
           ),
           const SizedBox(height: 12),
           Tooltip(
-            message: "Back",
-            preferBelow: false,
+            message: "Go back",
             child: FloatingActionButton(
               heroTag: "back_btn",
               onPressed: () => context.pop(),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Iconify(Ph.caret_left),
+              child: const Iconify(Ph.caret_left),
             ),
           ),
         ],
