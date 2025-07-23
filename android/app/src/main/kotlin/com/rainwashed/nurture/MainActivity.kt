@@ -1,4 +1,4 @@
-package com.example.ofd
+package com.rainwashed.nurture
 
 import io.flutter.embedding.android.FlutterActivity
 
