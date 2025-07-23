@@ -42,43 +42,97 @@ class _ProductSummaryWidgetState extends State<ProductSummaryWidget> {
     final String? imageUrl = widget.productData.imageFrontUrl;
 
     final Allergens? allergens = widget.productData.allergens;
-    final List<AllergensTag>? allergensConverted = allergens?.names
-        .map((allergenName) => looseStringToAllergen(allergenName))
-        .toList();
+    final List<AllergensTag> allergensConverted = [];
+    if (allergens?.names != null) {
+      for (final allergenName in allergens!.names) {
+        print("attempting to convert $allergenName");
 
-    List<AllergensTag> avoidConflicts(List<AllergensTag> userPreference, List<AllergensTag> productAllergens) {
-      final List<AllergensTag> avoidTags = [];
-
-      for (AllergensTag user in userPreference) {
-        for (AllergensTag product in userPreference) {
-          if (user == product) {
-            avoidTags.add(user);
-          }
+        try {
+          allergensConverted.add(looseStringToAllergen(allergenName));
+        } catch (e) {
+          // Log allergens that can't be parsed. This happens when the
+          // openfoodfacts API returns an allergen that is not in the local
+          // AllergensTag enum.
+          print('Could not parse allergen: "$allergenName"');
         }
       }
-
-      return avoidTags; 
     }
 
-    List<AllergensTag> warnConflicts(List<AllergensTag> userPreference, List<AllergensTag> productAllergens) {
-      final List<AllergensTag> warnTags = [];
-
-      for (AllergensTag user in userPreference) {
-        for (AllergensTag product in userPreference) {
-          if (user == product) {
-            warnTags.add(user);
-          }
-        }
-      }
-
-      return warnTags; 
+    List<AllergensTag> avoidConflicts(
+      List<AllergensTag> userPreference,
+      List<AllergensTag> productAllergens,
+    ) {
+      return userPreference
+          .toSet()
+          .intersection(productAllergens.toSet())
+          .toList();
     }
+
+    List<AllergensTag> warnConflicts(
+      List<AllergensTag> userPreference,
+      List<AllergensTag> productAllergens,
+    ) {
+      return userPreference
+          .toSet()
+          .intersection(productAllergens.toSet())
+          .toList();
+    }
+
+    print("Allergens: ${allergensConverted.toString()}");
 
     return FutureBuilder(
       future: allergenConfiguration,
       builder: (context, snapshot) {
+        final avoidedAllergens = avoidConflicts(
+          snapshot.data?.avoid
+                  .map((allergenString) => stringToAllergen(allergenString))
+                  .toList() ??
+              [],
+          allergensConverted,
+        );
+
+        final warnedAllergens = warnConflicts(
+          snapshot.data?.warn
+                  .map((allergenString) => stringToAllergen(allergenString))
+                  .toList() ??
+              [],
+          allergensConverted,
+        );
+
         if (snapshot.connectionState == ConnectionState.done) {
-          return Container(child: Column(children: [Text(productName)]));
+          return Container(
+            child: Column(
+              children: [
+                Text(productName),
+                Container(
+                  child: (allergensConverted.isNotEmpty)
+                      ? Column(
+                          children: allergensConverted
+                              .map((a) => Text(a.toString()))
+                              .toList(),
+                        )
+                      : Text(
+                          "No allergens were found. Please double check with package labeling or a trusted source.",
+                        ),
+                ),
+                if (allergensConverted.isNotEmpty &&
+                    avoidedAllergens.isNotEmpty)
+                  Column(
+                    children: [
+                      Text("These allergens conflict with your preferences:"),
+                      ...avoidedAllergens.map((a) => Text(a.toString())),
+                    ],
+                  ),
+                if (allergensConverted.isNotEmpty && warnedAllergens.isNotEmpty)
+                  Column(
+                    children: [
+                      Text("These allergens are warned with your preferences:"),
+                      ...warnedAllergens.map((a) => Text(a.toString())),
+                    ],
+                  ),
+              ],
+            ),
+          );
         } else {
           return Container(child: Center(child: CircularProgressIndicator()));
         }

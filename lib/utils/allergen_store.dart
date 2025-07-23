@@ -52,7 +52,7 @@ extension StandardReadingFormat on String {
 String allergenToString(AllergensTag allergen) => allergen.toString();
 AllergensTag stringToAllergen(String allergenString) =>
     AllergensTag.values.firstWhere((e) => e.toString() == allergenString);
-AllergensTag looseStringToAllergen(String allergenName) => AllergensTag.values.firstWhere((e) => e.toString().contains(allergenName));
+AllergensTag looseStringToAllergen(String allergenName) => AllergensTag.values.firstWhere((e) => e.toString().toLowerCase().contains(allergenName.toLowerCase()));
 String cleanupAllergenString(String allergenString) => allergenString.replaceAll("AllergensTag.", "").replaceAll("_", " ").standardCapitalize();
 
 Future<String> getConfigurationFolder() async {
