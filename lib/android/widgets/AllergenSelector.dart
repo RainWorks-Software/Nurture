@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ph.dart';
-import 'package:iconify_flutter/icons/icon_park_outline.dart';
-import 'package:iconify_flutter/icons/carbon.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
+import 'package:iconify_flutter_plus/icons/icon_park_outline.dart';
+import 'package:iconify_flutter_plus/icons/carbon.dart';
 import 'package:ofd/utils/allergen_store.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 
