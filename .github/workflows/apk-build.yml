@@ -1,0 +1,33 @@
+name: "build APK"
+
+on:
+  push:
+    branches:
+      - alpha
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Setup Flutter and Build
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+      - name: Get dependencies
+        run: flutter pub get
+      # - run: flutter test
+      - name: Build apk
+        run: flutter build apk
+      - name: Build appbundle
+        run: flutter build appbundle
+      - name: Create draft release with assets
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          token: ${{secrets.GITHUB_TOKEN}}
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
