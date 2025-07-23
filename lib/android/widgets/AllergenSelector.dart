@@ -99,58 +99,117 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
       future: stateFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Wrap(
-                spacing: 4,
-                runSpacing: 4,
-                children: primaryAllergens
-                    .map(
-                      (allergen) => ActionChip(
-                        onPressed: () {
-                          setState(() {
-                            final currentIndex =
-                                allergenStates[allergen]?.index;
-                            if (currentIndex == null) return;
-                            allergenStates[allergen] =
-                                AllergenSelectionEnum.values[(currentIndex +
-                                        1) %
-                                    (AllergenSelectionEnum.values.length)];
-                          });
-                        },
-                        label: Text(
-                          cleanupAllergenString(allergenToString(allergen)),
-                        ),
-                        avatar: Iconify(
-                          AllergenEnumToIcon[allergen] ?? Ph.placeholder,
-                          color: ThemeData().primaryColor,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            width: 1,
-                            color:
-                                AllergenSelectionEnumStyle[allergenStates[allergen]] ??
-                                Colors.transparent,
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text("Configure your allergens:", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8), 
+                // Descriptor Legend
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLegendCircle(Colors.redAccent, "Avoid"),
+                      const SizedBox(width: 12),
+                      _buildLegendCircle(Colors.yellowAccent, "Warn"),
+                      const SizedBox(width: 12),
+                      _buildLegendCircle(Colors.grey, "Ignore"),
+                    ],
+                  ),
+                ),
+
+                // Allergen Chips
+                Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: primaryAllergens.map((allergen) {
+                        final currentState = allergenStates[allergen]!;
+                        return ActionChip(
+                          onPressed: () {
+                            setState(() {
+                              final currentIndex = currentState.index;
+                              allergenStates[allergen] =
+                                  AllergenSelectionEnum.values[(currentIndex +
+                                          1) %
+                                      AllergenSelectionEnum.values.length];
+                            });
+                          },
+                          label: Text(
+                            cleanupAllergenString(allergenToString(allergen)),
+                            style: const TextStyle(fontSize: 14),
                           ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-              FilledButton(
-                onPressed: () {
-                  createNewAllergenConfigurationWithState(allergenStates);
-                },
-                child: const Text("Save Changes"),
-              ),
-            ],
+                          avatar: Iconify(
+                            AllergenEnumToIcon[allergen] ?? Ph.placeholder,
+                            color: Colors.grey,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color:
+                                  AllergenSelectionEnumStyle[currentState] ??
+                                  Colors.transparent,
+                              width: 1.5,
+                            ),
+                          ),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).chipTheme.backgroundColor?.withOpacity(0.1),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Save Button
+                FilledButton.icon(
+                  onPressed: () {
+                    createNewAllergenConfigurationWithState(allergenStates);
+                  },
+                  icon: const Iconify(Ph.floppy_disk),
+                  label: const Text("Save Changes"),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ],
+            ),
           );
         } else {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
       },
+    );
+  }
+
+  /// Legend Indicator Builder
+  Widget _buildLegendCircle(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+        ),
+      ],
     );
   }
 }

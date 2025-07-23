@@ -10,7 +10,7 @@ class MePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: AllergenSelectorChips()),
+      body: const Center(child: AllergenSelectorChips()),
       floatingActionButton: Tooltip(
         message: "Back",
         preferBelow: false,
