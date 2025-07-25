@@ -259,18 +259,28 @@ class _FoodCardState extends State<FoodCard> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Tooltip(
-            message: "Ask AI about this product",
-            child: FloatingActionButton.small(
-              heroTag: "ai_btn",
-              onPressed: () {
-                // TODO: Implement AI chat functionality
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Iconify(Ph.robot),
-            ),
+          FutureBuilder(
+            future: foodData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) { 
+              return Tooltip(
+                message: "Ask AI about this product",
+                child: FloatingActionButton.small(
+                  heroTag: "ai_btn",
+                  onPressed: () {
+                    context.push("ai", extra: snapshot.data!.product!); 
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Iconify(Ph.robot),
+                ),
+              );
+              } else {
+                return CircularProgressIndicator();
+              }
+            }
+            
           ),
           const SizedBox(height: 12),
           Tooltip(

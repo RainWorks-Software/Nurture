@@ -29,6 +29,7 @@ dependencies:
   shared_preferences: ^2.5.3 # persistent configuration
   path_provider: ^2.1.5 # user information will be stored here
   fluttertoast: ^8.2.12 # for toasts
+  flutter_gemma: ^0.10.0 # for AI
 
 dev_dependencies:
   flutter_test:

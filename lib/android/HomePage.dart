@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
             right: 40,
             child: Container(
               decoration: BoxDecoration(
-                color: ThemeData().primaryColor,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(25.0),
                 boxShadow: [
                   BoxShadow(
