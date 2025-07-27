@@ -259,6 +259,7 @@ class _FoodCardState extends State<FoodCard> {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          /* 
           FutureBuilder(
             future: foodData,
             builder: (context, snapshot) {
@@ -279,9 +280,9 @@ class _FoodCardState extends State<FoodCard> {
               } else {
                 return CircularProgressIndicator();
               }
-            }
-            
+            } 
           ),
+          */
           const SizedBox(height: 12),
           Tooltip(
             message: "Go back",
