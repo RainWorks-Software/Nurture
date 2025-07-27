@@ -37,11 +37,13 @@ jobs:
         run: flutter build apk
       - name: Build appbundle
         run: flutter build appbundle
-      - name: Create draft release with assets
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
-          token: ${{secrets.GITHUB_TOKEN}}
+          name: Alpha Build
+          tag_name: alpha
+          generate_release_notes: true
+          prerelease: true
           files: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
