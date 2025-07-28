@@ -50,14 +50,14 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
     if (!mounted) return;
 
     setState(() {
-      allergenConfiguration.avoid.forEach((allergenString) {
+      for (var allergenString in allergenConfiguration.avoid) {
         final allergenEnum = stringToAllergen(allergenString);
         allergenStates[allergenEnum] = AllergenSelectionEnum.avoid;
-      });
-      allergenConfiguration.warn.forEach((allergenString) {
+      }
+      for (var allergenString in allergenConfiguration.warn) {
         final allergenEnum = stringToAllergen(allergenString);
         allergenStates[allergenEnum] = AllergenSelectionEnum.warn;
-      });
+      }
     });
   }
 
@@ -68,7 +68,7 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
   ) async {
     final UserAllergenConfiguration newAllergenConfiguration =
         UserAllergenConfiguration(avoid: [], warn: []);
-    allergenStateArgument.entries.forEach((allergenState) {
+    for (var allergenState in allergenStateArgument.entries) {
       final allergenString = allergenToString(allergenState.key);
       final allergenSelectionEnum = allergenState.value;
 
@@ -80,7 +80,7 @@ class _AllergenSelectorChipsState extends State<AllergenSelectorChips> {
         default:
           break;
       }
-    });
+    }
 
     await writeAllergenConfigurationObject(newAllergenConfiguration);
 

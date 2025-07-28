@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:convert";
+import "dart:developer" show log;
 import "dart:io";
 
 import "package:openfoodfacts/openfoodfacts.dart";
@@ -45,7 +46,7 @@ final List<AllergensTag> primaryAllergens = [...AllergensTag.values];
 
 extension StandardReadingFormat on String {
   String standardCapitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }
 
@@ -66,7 +67,7 @@ Future<UserAllergenConfiguration> getAllergenConfigurationObject() async {
   final finalPath = "$configurationDirectory/$ConfigurationFileName";
   final configFile = File(finalPath);
 
-  print("configurationPath: $finalPath");
+  log("configurationPath: $finalPath");
 
   if (!configFile.existsSync()) {
     // this means a new one has to be created
